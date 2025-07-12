@@ -41,18 +41,29 @@ export async function POST(request: Request) {
       throw imageError;
     }
 
-    // 2. Save product details to the database
+    // 2. Get the user's profile
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      throw new Error("Could not find the user's profile.");
+    }
+
+    // 3. Save product details to the database
     const { data: productData, error: productError } = await supabase
       .from("products")
       .insert([
         {
           user_id: user.id,
-          profile_id: user.id, // Assuming profile_id is the same as user_id
+          profile_id: profile.id, // Use the fetched profile_id
           title,
           description,
           tags,
           stock,
-          image_url: imageData.path,
+          image: imageData.path,
         },
       ])
       .select();
@@ -63,12 +74,15 @@ export async function POST(request: Request) {
 
     return NextResponse.json(productData[0]);
   } catch (e: unknown) {
+    console.error("Error creating product:", e); // Detailed server-side log
     if (e instanceof Error) {
       return NextResponse.json({ error: e.message }, { status: 500 });
     }
-    return NextResponse.json(
-      { error: "An unknown error occurred." },
-      { status: 500 }
-    );
+    // Attempt to serialize the error if it's not a standard Error instance
+    const errorMessage =
+      typeof e === "object" && e !== null
+        ? JSON.stringify(e)
+        : "An unknown error occurred.";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

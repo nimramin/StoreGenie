@@ -18,12 +18,13 @@ export async function POST(request: Request) {
 
     const { error } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: user.id,
+        email: user.email,
         store_name: storeName,
         store_slug: storeSlug,
         is_setup_complete: true,
-      })
-      .eq('id', user.id);
+      });
 
     if (error) {
       // Handle potential duplicate slug error

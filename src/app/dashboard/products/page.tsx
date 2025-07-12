@@ -42,7 +42,7 @@ export default async function ProductsPage() {
               {products.map((product) => (
                 <li key={product.id} className="py-5 flex items-center space-x-4">
                   <div className="flex-shrink-0">
-                    <img className="h-16 w-16 rounded-lg object-cover" src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product_images/${product.image_url}`} alt={product.title} />
+                    <img className="h-16 w-16 rounded-lg object-cover" src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product_images/${product.image}`} alt={product.title} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="text-lg font-semibold text-gray-800 truncate">

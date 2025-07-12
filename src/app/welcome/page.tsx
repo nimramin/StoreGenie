@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { type User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
@@ -11,43 +11,60 @@ export default function WelcomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [storeName, setStoreName] = useState('');
   const [storeSlug, setStoreSlug] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(false); // Start with loading false
   const [error, setError] = useState('');
 
-  const getProfile = useCallback(async (user: User) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('store_name, store_slug')
-      .eq('id', user.id)
-      .single();
-
-    if (error) {
-      console.error('Error fetching profile:', error);
-      setError('Could not load your store profile. Please try again.');
-    } else if (data) {
-      setStoreName(data.store_name || '');
-      setStoreSlug(data.store_slug || '');
-    }
-    setLoading(false);
-  }, [supabase]);
-
+  // Get the user object on page load
   useEffect(() => {
-    const getUserAndProfile = async () => {
+    const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUser(user);
-        await getProfile(user);
       } else {
+        // If no user, redirect to login
         router.push('/login');
       }
     };
-    getUserAndProfile();
-  }, [router, supabase, getProfile]);
+    getUser();
+  }, [router, supabase]);
+
+  // Create a profile as soon as the user is available
+  useEffect(() => {
+    const createProfile = async () => {
+      if (user) {
+        // The upsert will create the profile if it doesn't exist,
+        // or do nothing if it does.
+        await supabase.from('profiles').upsert({ id: user.id, email: user.email });
+      }
+    };
+    createProfile();
+  }, [user, supabase]);
+
+  // Pre-fill form with details from email
+  useEffect(() => {
+    if (user?.email) {
+      const emailUsername = user.email.split('@')[0];
+      
+      // Create a store name: "john.doe" -> "John Doe"
+      const suggestedName = emailUsername
+        .split('.')
+        .map(name => name.charAt(0).toUpperCase() + name.slice(1))
+        .join(' ');
+      setStoreName(suggestedName);
+
+      // Create a store slug: "john.doe" -> "john-doe"
+      const suggestedSlug = emailUsername.replace(/\./g, '-').toLowerCase();
+      setStoreSlug(suggestedSlug);
+    }
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!user) return;
+    if (!user) {
+      setError('Could not identify user. Please try logging in again.');
+      return;
+    }
 
     // We will create this API endpoint in the next step
     const response = await fetch('/api/profile/setup', {
