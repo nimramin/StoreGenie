@@ -22,8 +22,9 @@ export async function POST(request: Request) {
     const description = formData.get("description") as string;
     const tags = formData.get("tags") as string;
     const stock = parseInt(formData.get("stock") as string, 10);
+    const price = parseFloat(formData.get("price") as string);
 
-    if (!image || !title || !stock) {
+    if (!image || !title || !stock || !price) {
       return NextResponse.json(
         { error: "Missing required fields." },
         { status: 400 }
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
           tags,
           stock,
           image: imageData.path,
+          price,
         },
       ])
       .select();

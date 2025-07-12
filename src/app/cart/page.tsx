@@ -39,6 +39,12 @@ export default function CartPage() {
     );
   }
 
+  const subtotal = cart.cart_items.reduce(
+    (acc, item) => acc + item.products.price * item.quantity,
+    0
+  );
+  const total = subtotal; // Assuming no shipping or taxes for now
+
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pt-16 pb-24 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -70,7 +76,7 @@ export default function CartPage() {
                             </a>
                           </h3>
                         </div>
-                        <p className="mt-1 text-sm font-medium text-gray-900">Stock: {item.products.stock}</p>
+                        <p className="mt-1 text-sm font-medium text-gray-900">${item.products.price.toFixed(2)}</p>
                       </div>
 
                       <div className="mt-4 sm:mt-0 sm:pr-9">
@@ -120,7 +126,7 @@ export default function CartPage() {
             <div className="mt-6">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-600">Subtotal</p>
-                <p className="text-sm font-medium text-gray-900">$0.00</p>
+                <p className="text-sm font-medium text-gray-900">${subtotal.toFixed(2)}</p>
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <p className="text-sm text-gray-600">Shipping</p>
@@ -128,7 +134,7 @@ export default function CartPage() {
               </div>
               <div className="mt-4 border-t border-gray-200 pt-4 flex items-center justify-between">
                 <p className="text-base font-medium text-gray-900">Order total</p>
-                <p className="text-base font-medium text-gray-900">$0.00</p>
+                <p className="text-base font-medium text-gray-900">${total.toFixed(2)}</p>
               </div>
             </div>
 

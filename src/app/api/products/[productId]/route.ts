@@ -1,5 +1,5 @@
-import { createClient } from '@/utils/supabase/server';
-import { NextResponse } from 'next/server';
+import { createClient } from "@/utils/supabase/server";
+import { NextResponse } from "next/server";
 
 export async function PUT(
   request: Request,
@@ -7,91 +7,163 @@ export async function PUT(
 ) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'You must be logged in to update a product.' }, { status: 401 });
+      return NextResponse.json(
+        { error: "You must be logged in to update a product." },
+        { status: 401 }
+      );
     }
 
-    const { title, description, tags, stock, customization_possible } = await request.json();
     const { productId } = params;
+    const { title, description, tags, stock, price } = await request.json();
 
-    if (!title || stock === undefined) {
-      return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
+    if (!title || !stock || !price) {
+      return NextResponse.json(
+        { error: "Missing required fields." },
+        { status: 400 }
+      );
     }
 
-    const { error } = await supabase
+    // Verify that the product belongs to the user
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .select("user_id")
+      .eq("id", productId)
+      .single();
+
+    if (productError || !product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
+    if (product.user_id !== user.id) {
+      return NextResponse.json(
+        { error: "You are not authorized to update this product." },
+        { status: 403 }
+      );
+    }
+
+    type UpdatePayload = {
+      title?: string;
+      description?: string;
+      tags?: string;
+      stock?: number;
+      price?: number;
+    };
+
+    const updatePayload: UpdatePayload = {};
+    if (title !== undefined) updatePayload.title = title;
+    if (description !== undefined) updatePayload.description = description;
+    if (tags !== undefined) updatePayload.tags = tags;
+    if (stock !== undefined) updatePayload.stock = Number(stock);
+    if (price !== undefined) updatePayload.price = Number(price);
+
+    console.log('Update Payload:', updatePayload);
+    console.log('Stock Type:', typeof updatePayload.stock);
+    console.log('Price Type:', typeof updatePayload.price);
+
+    const { error: updateError } = await supabase
       .from('products')
-      .update({
-        title,
-        description,
-        tags,
-        stock,
-        customization_possible,
-      })
-      .eq('id', productId)
-      .eq('user_id', user.id);
+      .update(updatePayload)
+      .eq('id', productId);
 
-    if (error) {
-      throw error;
+    if (updateError) {
+      console.error('Supabase update error:', updateError);
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
-    return NextResponse.json({ message: 'Product updated successfully.' });
+    const { data: updatedProduct, error: selectError } = await supabase
+        .from('products')
+        .select('*')
+        .eq('id', productId)
+        .single();
 
+    if (selectError) {
+        return NextResponse.json({ error: selectError.message }, { status: 500 });
+    }
+
+    if (!updatedProduct) {
+        return NextResponse.json({ error: 'Update failed or product not found after update.' }, { status: 500 });
+    }
+
+    return NextResponse.json(updatedProduct);
   } catch (e: unknown) {
+    console.error("Error updating product:", e);
+    let errorMessage = "An unknown error occurred.";
     if (e instanceof Error) {
-      return NextResponse.json({ error: e.message }, { status: 500 });
+      errorMessage = e.message;
     }
-    return NextResponse.json({ error: 'An unknown error occurred.' }, { status: 500 });
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
-
 export async function DELETE(
   request: Request,
   { params }: { params: { productId: string } }
 ) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: 'You must be logged in to delete a product.' }, { status: 401 });
+      return NextResponse.json(
+        { error: "You must be logged in to delete a product." },
+        { status: 401 }
+      );
     }
 
     const { productId } = params;
 
-    // First, delete all images associated with the product from storage
-    const { data: images, error: imagesError } = await supabase
-      .from('product_images')
-      .select('image_url')
-      .eq('product_id', productId);
+    // Verify that the product belongs to the user
+    const { data: product, error: productError } = await supabase
+      .from("products")
+      .select("user_id, image")
+      .eq("id", productId)
+      .single();
 
-    if (imagesError) {
-      throw imagesError;
+    if (productError || !product) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    if (images && images.length > 0) {
-      const filePaths = images.map(image => image.image_url);
-      await supabase.storage.from('product_images').remove(filePaths);
+    if (product.user_id !== user.id) {
+      return NextResponse.json(
+        { error: "You are not authorized to delete this product." },
+        { status: 403 }
+      );
     }
 
-    // Then, delete the product record itself
+    // Delete the product image from storage
+    if (product.image) {
+      const { error: imageError } = await supabase.storage
+        .from("product_images")
+        .remove([product.image]);
+
+      if (imageError) {
+        // Log the error but don't block the product deletion
+        console.error("Error deleting product image:", imageError);
+      }
+    }
+
     const { error: deleteError } = await supabase
-      .from('products')
+      .from("products")
       .delete()
-      .eq('id', productId)
-      .eq('user_id', user.id);
+      .eq("id", productId);
 
     if (deleteError) {
       throw deleteError;
     }
 
-    return NextResponse.json({ message: 'Product deleted successfully.' });
-
+    return NextResponse.json({ message: "Product deleted successfully" });
   } catch (e: unknown) {
+    console.error("Error deleting product:", e);
+    let errorMessage = "An unknown error occurred.";
     if (e instanceof Error) {
-      return NextResponse.json({ error: e.message }, { status: 500 });
+      errorMessage = e.message;
     }
-    return NextResponse.json({ error: 'An unknown error occurred.' }, { status: 500 });
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

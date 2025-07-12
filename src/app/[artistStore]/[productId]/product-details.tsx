@@ -7,6 +7,7 @@ type Product = {
   id: string;
   title: string;
   description: string;
+  price: number;
   stock: number;
   image: string | null;
   storeName: string | undefined;
@@ -67,7 +68,7 @@ export default function ProductDetails({ product }: { product: Product }) {
 
             <div className="mt-3">
               <h2 className="sr-only">Product information</h2>
-              <p className="text-3xl tracking-tight text-gray-900">Stock: {product.stock}</p>
+              <p className="text-3xl tracking-tight text-gray-900">${product.price.toFixed(2)}</p>
             </div>
 
             <div className="mt-6">

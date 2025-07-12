@@ -13,6 +13,7 @@ type Product = {
   id: string;
   title: string;
   description: string;
+  price: number;
   stock: number;
   image: string | null;
   profiles: {
@@ -31,6 +32,7 @@ export default async function ProductPage({ params }: Props) {
       id,
       title,
       description,
+      price,
       stock,
       image,
       profiles (
@@ -49,6 +51,7 @@ export default async function ProductPage({ params }: Props) {
     id: product.id,
     title: product.title,
     description: product.description,
+    price: product.price,
     stock: product.stock,
     image: product.image,
     storeName: product.profiles?.store_name,

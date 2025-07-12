@@ -12,6 +12,7 @@ type Product = {
   id: string;
   title: string;
   description: string;
+  price: number;
   stock: number;
   image: string | null;
 };
@@ -29,6 +30,7 @@ export default async function StorePage({ params }: Props) {
         id,
         title,
         description,
+        price,
         stock,
         image
       )
@@ -73,7 +75,16 @@ export default async function StorePage({ params }: Props) {
                       </Link>
                     </h3>
                     <p className="mt-1 text-sm text-gray-500 truncate">{product.description}</p>
-                    <p className="mt-2 text-base font-semibold text-gray-900">Stock: {product.stock}</p>
+                    <div className="flex justify-between items-center mt-2">
+                      <p className="text-lg font-semibold text-gray-900">${product.price.toFixed(2)}</p>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        product.stock > 10 ? 'bg-green-100 text-green-800' :
+                        product.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               );

@@ -11,6 +11,7 @@ type CartItem = {
     title: string;
     image: string | null;
     stock: number;
+    price: number;
   };
 };
 
@@ -22,7 +23,7 @@ type Cart = {
 type CartContextType = {
   cart: Cart | null;
   isLoading: boolean;
-  error: any;
+  error: Error | null;
   refetch: () => void;
 };
 
@@ -31,7 +32,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<any>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchCart = async () => {
     setIsLoading(true);
@@ -40,7 +41,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setCart(data);
     } catch (err) {
-      setError(err);
+      if (err instanceof Error) {
+        setError(err);
+      } else {
+        setError(new Error('An unknown error occurred'));
+      }
     } finally {
       setIsLoading(false);
     }

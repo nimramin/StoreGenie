@@ -8,7 +8,7 @@ StoreGenie AI is a modern, AI-powered e-commerce platform that allows creators t
 - **Automated Onboarding:** A simple setup process for new users to create their stores.
 - **AI-Powered Product Creation:** Use AI to generate product descriptions, tags, and more.
 - **Public Storefronts:** Each user gets a unique, publicly accessible storefront.
-- **Product Management:** A dashboard for users to manage their products.
+- **Product Management:** A dashboard for users to create, edit, and delete their products.
 - **Shopping Cart:** Full-featured shopping cart for both guest and logged-in users.
 
 ## Tech Stack

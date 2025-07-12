@@ -57,6 +57,17 @@ CREATE TABLE public.products (
     created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
     CONSTRAINT price_non_negative CHECK (price >= 0)
 );
+
+-- RLS Policy for products
+CREATE POLICY "Users can update their own products"
+ON public.products
+FOR UPDATE
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Allow owners to delete their own products"
+ON public.products
+FOR DELETE
+USING (auth.uid() = user_id);
 ```
 
 ### `product_images`

@@ -19,6 +19,7 @@ export default function NewProductPage() {
   const [description, setDescription] = useState('');
   const [tags, setTags] = useState('');
   const [stock, setStock] = useState(1);
+  const [price, setPrice] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
@@ -95,6 +96,7 @@ export default function NewProductPage() {
     formData.append('description', description);
     formData.append('tags', tags);
     formData.append('stock', stock.toString());
+    formData.append('price', price.toString());
 
     const response = await fetch('/api/products', {
       method: 'POST',
@@ -167,6 +169,10 @@ export default function NewProductPage() {
             <div>
               <label htmlFor="stock" className="block text-sm font-medium text-gray-700">Stock Count</label>
               <input type="number" id="stock" value={stock} onChange={(e) => setStock(parseInt(e.target.value, 10))} className="mt-1 block w-full" min="0" required />
+            </div>
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
+              <input type="number" id="price" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} className="mt-1 block w-full" min="0" step="0.01" required />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
             <button

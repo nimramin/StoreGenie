@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import ProductActions from '@/components/ProductActions';
 
 export default async function ProductsPage() {
   const supabase = await createClient();
@@ -49,9 +50,10 @@ export default async function ProductsPage() {
                       {product.title}
                     </h3>
                     <p className="text-sm text-gray-600">
-                      Stock: {product.stock}
+                      Stock: {product.stock} | Price: ${product.price}
                     </p>
                   </div>
+                  <ProductActions productId={product.id} />
                 </li>
               ))}
             </ul>
