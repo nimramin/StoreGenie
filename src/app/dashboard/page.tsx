@@ -1,39 +1,30 @@
-'use client';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { createBrowserClient } from '@supabase/ssr';
+export default async function DashboardPage() {
+  const supabase = await createClient();
 
-export default function DashboardPage() {
-  const [userEmail, setUserEmail] = useState<string | undefined>(undefined);
-  const router = useRouter();
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUserEmail(user?.email);
-    };
-    getUser();
-  }, [supabase]);
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data?.user) {
+    redirect('/login');
+  }
 
   const handleLogout = async () => {
+    'use server';
+    const supabase = await createClient();
     await supabase.auth.signOut();
-    router.push('/login');
+    revalidatePath('/', 'layout');
+    redirect('/login');
   };
 
   return (
     <div>
       <h1>Welcome to your Dashboard</h1>
-      {userEmail ? (
-        <p>You are logged in as: {userEmail}</p>
-      ) : (
-        <p>Loading user information...</p>
-      )}
-      <button onClick={handleLogout}>Logout</button>
+      <p>You are logged in as: {data.user.email}</p>
+      <form action={handleLogout}>
+        <button type="submit">Logout</button>
+      </form>
     </div>
   );
 }
