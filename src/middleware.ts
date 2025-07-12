@@ -59,6 +59,20 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   // if user is not signed in and the current path is not /login, redirect the user to /login
+  if (user && !request.nextUrl.pathname.startsWith('/welcome')) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_setup_complete')
+      .eq('id', user.id)
+      .single();
+
+    // If the user has a profile but hasn't completed the setup,
+    // redirect them to the welcome page.
+    if (profile && profile.is_setup_complete === false) {
+      return NextResponse.redirect(new URL('/welcome', request.url));
+    }
+  }
+
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
     return NextResponse.redirect(new URL('/login', request.url));
   }

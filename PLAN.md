@@ -4,30 +4,26 @@ This document outlines the development plan for the StoreGenie AI MVP. It serves
 
 ## High-Level Architecture
 
-We will build a multi-tenant application using Next.js and Supabase. Each artist will have their own unique storefront URL. We will implement a testing strategy focused on API routes to ensure backend stability.
+We will build a multi-tenant application using a route-based approach with Next.js and Supabase. A critical part of the user journey is a first-time setup experience to ensure every artist configures their store before using the dashboard.
 
 ```mermaid
 graph TD
-    subgraph "Phase 1: Core Auth & Setup"
-        A1[**Auth:** Implement Google OAuth Login] --> T1( **Test:** Verify Google Login & Dashboard Access);
-        T1 --> DB1[**DB:** Design 'profiles' table];
-        DB1 --> DB2(**DB:** Create Trigger for auto-profile creation on new user);
-        DB2 --> A4(**Middleware:** Protect '/dashboard' routes);
-        A4 --> T3( **Test:** Verify middleware protection);
+    subgraph "Phase 1: Auth & Onboarding"
+        A1[Login with Google] --> A2{Middleware Checks Profile};
+        A2 -- "is_setup_complete = false" --> W1[Redirect to /welcome];
+        W1 --> W2[Welcome Page: User sets Store Name & Slug];
+        W2 --> W3[Update Profile & Set is_setup_complete = true];
+        W3 --> A3[Redirect to /dashboard];
+        A2 -- "is_setup_complete = true" --> A3[Access /dashboard];
     end
 
-    subgraph "Phase 2: Product Management (Dashboard)"
-        P1(Create Product Upload Form) --> P2(Setup Supabase Storage);
-        P2 --> P3(Create `POST /api/products` endpoint) --> T4( **Test:** Write test for Product Creation API);
+    subgraph "Phase 2: Core App"
+        D1[Dashboard] --> P1[Product Management];
+        D1 --> AN1[Analytics];
+        P1 --> S1[Public Storefront];
     end
 
-    subgraph "Phase 3: Public Storefront"
-        S1(Create Dynamic Store & Product Pages) --> S2(Implement 'Reserve/Buy' API) --> T5( **Test:** Write test for Reservation API);
-        T5 --> S3(Implement 'Custom Request' API) --> T6( **Test:** Write test for Custom Request API);
-    end
-
-    A4 --> P1;
-    T4 --> S1;
+    A3 --> D1;
 ```
 
 ## Task Checklist
@@ -38,7 +34,13 @@ graph TD
 - [x] **DB:** Create a Supabase trigger to auto-create a profile on user signup
 - [x] **Auth:** Create middleware to protect `/dashboard` and its sub-routes
 - [x] **Test:** Write a test to verify middleware is protecting routes
+- [x] **DB:** Add `is_setup_complete` flag to `profiles` table
+- [x] **Auth:** Update middleware to redirect new users to `/welcome`
+- [x] **Onboarding:** Create the `/welcome` page with a setup form
+- [x] **Onboarding:** Create an API endpoint to update the user's profile
+- [ ] **Test:** Write a test to verify the onboarding flow
 - [x] **Dashboard:** Create a basic authenticated dashboard page
+- [ ] **DB:** Create the `products` table
 - [x] **Products:** Create product upload form at `/dashboard/products/new`
 - [x] **Products:** Configure Supabase Storage for product images
 - [ ] **Products:** Build `POST /api/products` endpoint

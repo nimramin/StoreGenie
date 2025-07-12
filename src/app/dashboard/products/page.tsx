@@ -19,7 +19,7 @@ export default function ProductsPage() {
           </h1>
           <Link
             href="/dashboard/products/new"
-            className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
+            className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900"
           >
             + Add New Product
           </Link>

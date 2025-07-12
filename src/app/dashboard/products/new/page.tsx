@@ -1,4 +1,4 @@
-th'use client';
+'use client';
 
 import { useState } from 'react';
 
@@ -72,7 +72,7 @@ export default function NewProductPage() {
               type="button"
               onClick={handleGenerateListing}
               disabled={!image || isGenerating}
-              className="w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:bg-gray-400"
+              className="w-full px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900 disabled:bg-gray-400"
             >
               {isGenerating ? 'Generating...' : '2. Generate Listing with AI'}
             </button>
@@ -106,7 +106,7 @@ export default function NewProductPage() {
             </div>
             <button
               type="submit"
-              className="w-full px-4 py-3 font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:bg-gray-400"
+              className="w-full px-4 py-3 font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900 disabled:bg-gray-400"
             >
               Save Product
             </button>
