@@ -38,12 +38,12 @@ graph TD
 - [x] **Auth:** Update middleware to redirect new users to `/welcome`
 - [x] **Onboarding:** Create the `/welcome` page with a setup form
 - [x] **Onboarding:** Create an API endpoint to update the user's profile
-- [ ] **Test:** Write a test to verify the onboarding flow
+- [x] **Test:** Write a test to verify the onboarding flow
 - [x] **Dashboard:** Create a basic authenticated dashboard page
-- [ ] **DB:** Create the `products` table
+- [x] **DB:** Create the `products` table
 - [x] **Products:** Create product upload form at `/dashboard/products/new`
 - [x] **Products:** Configure Supabase Storage for product images
-- [ ] **Products:** Build `POST /api/products` endpoint
+- [x] **Products:** Build `POST /api/products` endpoint
 - [ ] **Test:** Write a test for the product creation API
 - [ ] **Storefront:** Develop the dynamic public-facing store page at `/[artistStore]`
 - [ ] **Storefront:** Develop the dynamic public-facing product page at `/[artistStore]/[productId]`

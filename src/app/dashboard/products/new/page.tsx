@@ -37,10 +37,30 @@ export default function NewProductPage() {
     }, 2000);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Logic to save the final product details to the database
-    console.log({ title, description, tags, stock, image });
+    if (!image) return;
+
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('tags', tags);
+    formData.append('stock', stock.toString());
+
+    const response = await fetch('/api/products', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      alert('Product created successfully!');
+      // Optionally, redirect to the products page
+      // router.push('/dashboard/products');
+    } else {
+      const data = await response.json();
+      alert(`Error: ${data.error}`);
+    }
   };
 
   return (
