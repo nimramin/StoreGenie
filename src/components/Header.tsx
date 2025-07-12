@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import Cart from "./Cart";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
+  const pathname = usePathname();
+  const showCart = !pathname.startsWith("/dashboard");
+
   return (
     <header className="bg-white">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
@@ -14,7 +18,7 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex lg:flex-1 lg:justify-end">
-          <Cart />
+          {showCart && <Cart />}
         </div>
       </nav>
     </header>

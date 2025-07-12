@@ -52,8 +52,10 @@ CREATE TABLE public.products (
     description text,
     tags text,
     stock integer NOT NULL DEFAULT 0,
+    price numeric(10, 2) NOT NULL DEFAULT 0.00,
     image text,
-    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+    created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+    CONSTRAINT price_non_negative CHECK (price >= 0)
 );
 ```
 
@@ -94,7 +96,7 @@ CREATE TABLE public.cart_items (
 ## Task Checklist
 
 ### MVP
-- [ ] **Cart:** Implement cart functionality
+- [x] **Cart:** Implement cart functionality
 - [x] **Auth:** Implement Google OAuth Login
 - [x] **Test:** Verify Google Login flow and dashboard access
 - [x] **DB:** Design and create the `profiles` table in Supabase
@@ -113,6 +115,8 @@ CREATE TABLE public.cart_items (
 - [x] **Products:** Build `POST /api/products` endpoint
 - [ ] **AI:** Enhance Gemini prompt to include `customization_possible` flag
 - [ ] **Test:** Write a test for the product creation API
+- [ ] **Products:** Implement "Edit Product" functionality
+- [ ] **Products:** Implement "Delete Product" functionality
 - [x] **Storefront:** Develop the dynamic public-facing store page at `/[artistStore]`
 - [x] **Storefront:** Develop the dynamic public-facing product page at `/[artistStore]/[productId]`
 - [ ] **Storefront:** Display customization options on the product page

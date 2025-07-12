@@ -24,6 +24,8 @@
 .DS_Store
 *.pem
 
+# Go module cache
+/pkg
 # debug
 npm-debug.log*
 yarn-debug.log*
