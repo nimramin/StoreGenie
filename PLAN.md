@@ -35,12 +35,12 @@ graph TD
 - [x] **Auth:** Implement Google OAuth Login
 - [x] **Test:** Verify Google Login flow and dashboard access
 - [x] **DB:** Design and create the `profiles` table in Supabase
-- [ ] **DB:** Create a Supabase trigger to auto-create a profile on user signup
-- [ ] **Auth:** Create middleware to protect `/dashboard` and its sub-routes
-- [ ] **Test:** Write a test to verify middleware is protecting routes
-- [ ] **Dashboard:** Create a basic authenticated dashboard page
-- [ ] **Products:** Create product upload form at `/dashboard/products/new`
-- [ ] **Products:** Configure Supabase Storage for product images
+- [x] **DB:** Create a Supabase trigger to auto-create a profile on user signup
+- [x] **Auth:** Create middleware to protect `/dashboard` and its sub-routes
+- [x] **Test:** Write a test to verify middleware is protecting routes
+- [x] **Dashboard:** Create a basic authenticated dashboard page
+- [x] **Products:** Create product upload form at `/dashboard/products/new`
+- [x] **Products:** Configure Supabase Storage for product images
 - [ ] **Products:** Build `POST /api/products` endpoint
 - [ ] **Test:** Write a test for the product creation API
 - [ ] **Storefront:** Develop the dynamic public-facing store page at `/[artistStore]`
