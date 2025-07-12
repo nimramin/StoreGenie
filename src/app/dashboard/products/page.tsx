@@ -1,17 +1,28 @@
-'use client';
-
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 import Link from 'next/link';
 
-// This would typically come from your database
-const products = [
-  { id: 1, name: 'Hand-painted Mug', stock: 15 },
-  { id: 2, name: 'Crochet Bee', stock: 8 },
-  { id: 3, name: 'Resin Coaster Set', stock: 22 },
-];
+export default async function ProductsPage() {
+  const supabase = await createClient();
 
-export default function ProductsPage() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    redirect('/login');
+  }
+
+  const { data: products, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching products:', error);
+    // Handle error appropriately
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex flex-col items-center min-h-screen bg-gray-50 p-4">
       <div className="w-full max-w-4xl p-8 bg-white rounded-xl shadow-lg">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
@@ -26,20 +37,30 @@ export default function ProductsPage() {
         </div>
 
         <div className="flow-root">
-          <ul className="-my-5 divide-y divide-gray-200">
-            {products.map((product) => (
-              <li key={product.id} className="py-5">
-                <div className="relative focus-within:ring-2 focus-within:ring-indigo-500">
-                  <h3 className="text-sm font-semibold text-gray-800">
-                    {product.name}
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-                    Stock: {product.stock}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {products && products.length > 0 ? (
+            <ul className="-my-5 divide-y divide-gray-200">
+              {products.map((product) => (
+                <li key={product.id} className="py-5 flex items-center space-x-4">
+                  <div className="flex-shrink-0">
+                    <img className="h-16 w-16 rounded-lg object-cover" src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product_images/${product.image_url}`} alt={product.title} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-lg font-semibold text-gray-800 truncate">
+                      {product.title}
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      Stock: {product.stock}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-center py-12">
+              <h2 className="text-xl font-semibold text-gray-700">No products yet!</h2>
+              <p className="mt-2 text-gray-500">Click &quot;Add New Product&quot; to get started.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

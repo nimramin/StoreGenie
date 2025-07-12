@@ -4,7 +4,7 @@ This document outlines the development plan for the StoreGenie AI MVP. It serves
 
 ## High-Level Architecture
 
-We will build a multi-tenant application using a route-based approach with Next.js and Supabase. A critical part of the user journey is a first-time setup experience to ensure every artist configures their store before using the dashboard.
+We will build a multi-tenant application using a route-based approach with Next.js and Supabase. The core of the application is an AI-powered product creation process and a simple, effective onboarding flow.
 
 ```mermaid
 graph TD
@@ -19,7 +19,6 @@ graph TD
 
     subgraph "Phase 2: Core App"
         D1[Dashboard] --> P1[Product Management];
-        D1 --> AN1[Analytics];
         P1 --> S1[Public Storefront];
     end
 
@@ -28,6 +27,7 @@ graph TD
 
 ## Task Checklist
 
+### MVP
 - [x] **Auth:** Implement Google OAuth Login
 - [x] **Test:** Verify Google Login flow and dashboard access
 - [x] **DB:** Design and create the `profiles` table in Supabase
@@ -40,15 +40,20 @@ graph TD
 - [x] **Onboarding:** Create an API endpoint to update the user's profile
 - [x] **Test:** Write a test to verify the onboarding flow
 - [x] **Dashboard:** Create a basic authenticated dashboard page
-- [x] **DB:** Create the `products` table
+- [ ] **DB:** Create the `products` table with `customization_possible`
 - [x] **Products:** Create product upload form at `/dashboard/products/new`
 - [x] **Products:** Configure Supabase Storage for product images
-- [x] **Products:** Build `POST /api/products` endpoint
+- [ ] **AI:** Enhance Gemini prompt to include `customization_possible` flag
+- [ ] **Products:** Build `POST /api/products` endpoint
 - [ ] **Test:** Write a test for the product creation API
 - [ ] **Storefront:** Develop the dynamic public-facing store page at `/[artistStore]`
 - [ ] **Storefront:** Develop the dynamic public-facing product page at `/[artistStore]/[productId]`
-- [ ] **Storefront:** Implement "Reserve/Buy" feature with an API endpoint
-- [ ] **Test:** Write a test for the reservation API
-- [ ] **Storefront:** Implement "Custom Request" feature with an API endpoint
+- [ ] **Storefront:** Display customization options on the product page
+- [ ] **Storefront:** Implement "Request Customization" feature with an API endpoint
 - [ ] **Test:** Write a test for the custom request API
 - [ ] **Analytics:** Create the `/dashboard/analytics` page
+
+### Stretch Goals (Post-Hackathon)
+- **Duplicate Detection:** Implement perceptual hashing to detect and merge similar products.
+- **Dynamic Product Forms:** Create category-specific forms (e.g., for skincare, clothing).
+- **AI Ingredient Scanner:** Allow users to scan ingredient labels to auto-populate fields.
