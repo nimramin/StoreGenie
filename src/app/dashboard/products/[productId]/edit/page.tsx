@@ -3,29 +3,12 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-
-const Spinner = () => (
-  <svg
-    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-  >
-    <circle
-      className="opacity-25"
-      cx="12"
-      cy="12"
-      r="10"
-      stroke="currentColor"
-      strokeWidth="4"
-    ></circle>
-    <path
-      className="opacity-75"
-      fill="currentColor"
-      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-    ></path>
-  </svg>
-);
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -82,8 +65,6 @@ export default function EditProductPage() {
       price,
     };
 
-    console.log("Sending to API:", updatedProduct);
-
     const response = await fetch(`/api/products/${productId}`, {
       method: "PUT",
       headers: {
@@ -104,112 +85,78 @@ export default function EditProductPage() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Spinner />
+      <div className="flex justify-center items-center h-full">
+        <Loader2 className="h-8 w-8 animate-spin text-magic-primary" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-3xl p-8 bg-white rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Edit Product
-        </h1>
+    <Card className="bg-card/80 backdrop-blur-sm border-magic-accent">
+      <CardHeader>
+        <CardTitle>Edit Product</CardTitle>
+      </CardHeader>
+      <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Title
-            </label>
-            <input
-              type="text"
+          <div className="space-y-2">
+            <Label htmlFor="title">Title</Label>
+            <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 block w-full"
               required
             />
           </div>
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Description
-            </label>
-            <textarea
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={5}
-              className="mt-1 block w-full"
               required
-            ></textarea>
+            />
           </div>
-          <div>
-            <label
-              htmlFor="tags"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Tags (comma-separated)
-            </label>
-            <input
-              type="text"
+          <div className="space-y-2">
+            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Input
               id="tags"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              className="mt-1 block w-full"
             />
           </div>
-          <div>
-            <label
-              htmlFor="stock"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Stock Count
-            </label>
-            <input
-              type="number"
-              id="stock"
-              value={stock}
-              onChange={(e) => setStock(parseInt(e.target.value, 10))}
-              className="mt-1 block w-full"
-              min="0"
-              required
-            />
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="stock">Stock Count</Label>
+              <Input
+                id="stock"
+                type="number"
+                value={stock}
+                onChange={(e) => setStock(parseInt(e.target.value, 10))}
+                min="0"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="price">Price</Label>
+              <Input
+                id="price"
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(parseFloat(e.target.value))}
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label
-              htmlFor="price"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Price
-            </label>
-            <input
-              type="number"
-              id="price"
-              value={price}
-              onChange={(e) => setPrice(parseFloat(e.target.value))}
-              className="mt-1 block w-full"
-              min="0"
-              step="0.01"
-              required
-            />
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button
-            type="submit"
-            disabled={isSaving}
-            className="w-full px-4 py-3 flex justify-center items-center font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900 disabled:bg-gray-400"
-          >
-            {isSaving && <Spinner />}
+          {error && <p className="text-sm text-destructive">{error}</p>}
+          <Button type="submit" disabled={isSaving} className="w-full">
+            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {isSaving ? "Saving..." : "Save Changes"}
-          </button>
+          </Button>
         </form>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

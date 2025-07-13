@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Pencil, Trash2 } from 'lucide-react';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 export default function ProductActions({ productId }: { productId: number }) {
   const router = useRouter();
@@ -16,6 +19,8 @@ export default function ProductActions({ productId }: { productId: number }) {
       });
 
       if (response.ok) {
+        // Using a more subtle notification would be better in a real app
+        // For now, an alert is fine.
         alert('Product deleted successfully');
         router.refresh();
       } else {
@@ -28,16 +33,35 @@ export default function ProductActions({ productId }: { productId: number }) {
 
   return (
     <div className="flex items-center space-x-2">
-      <Link href={`/dashboard/products/${productId}/edit`} className="text-indigo-600 hover:text-indigo-900">
-        Edit
-      </Link>
-      <button
-        onClick={handleDelete}
-        disabled={isDeleting}
-        className="text-red-600 hover:text-red-900 disabled:opacity-50"
-      >
-        {isDeleting ? 'Deleting...' : 'Delete'}
-      </button>
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button asChild variant="outline" size="icon">
+            <Link href={`/dashboard/products/${productId}/edit`}>
+              <Pencil className="h-4 w-4" />
+              <span className="sr-only">Edit</span>
+            </Link>
+          </Button>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-auto px-3 py-1">
+          <p className="text-sm">Edit product</p>
+        </HoverCardContent>
+      </HoverCard>
+      <HoverCard>
+        <HoverCardTrigger asChild>
+          <Button
+            variant="destructive"
+            size="icon"
+            onClick={handleDelete}
+            disabled={isDeleting}
+          >
+            <Trash2 className="h-4 w-4" />
+            <span className="sr-only">{isDeleting ? 'Deleting...' : 'Delete'}</span>
+          </Button>
+        </HoverCardTrigger>
+        <HoverCardContent className="w-auto px-3 py-1">
+          <p className="text-sm">Delete product</p>
+        </HoverCardContent>
+      </HoverCard>
     </div>
   );
 }

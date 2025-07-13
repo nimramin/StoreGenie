@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-// A simple spinner component for loading states
-const Spinner = () => (
-  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-  </svg>
-);
+import imageCompression from 'browser-image-compression';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Loader2, UploadCloud, Wand2 } from 'lucide-react';
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -25,30 +24,35 @@ export default function NewProductPage() {
   const [error, setError] = useState('');
   const [step, setStep] = useState(1); // 1: Upload, 2: Edit
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 800,
+        useWebWorker: true,
       };
-      reader.readAsDataURL(file);
+      try {
+        const compressedFile = await imageCompression(file, options);
+        setImage(compressedFile);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(compressedFile);
+      } catch (error) {
+        console.error('Error compressing image:', error);
+        // Fallback to original file if compression fails
+        setImage(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
-  useEffect(() => {
-    // Pre-load the default image for development
-    if (process.env.NODE_ENV === 'development') {
-      fetch('/poster.jpg')
-        .then(res => res.blob())
-        .then(blob => {
-          const file = new File([blob], 'poster.jpg', { type: 'image/jpeg' });
-          setImage(file);
-          setImagePreview(URL.createObjectURL(file));
-        });
-    }
-  }, []);
 
   const handleGenerateListing = async () => {
     if (!image) return;
@@ -114,78 +118,95 @@ export default function NewProductPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-3xl p-8 bg-white rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Create a New Product
-        </h1>
-
-        {/* Step 1: Image Upload */}
+    <Card className="bg-card/80 backdrop-blur-sm border-magic-accent">
+      <CardHeader>
+        <CardTitle>Create a New Product</CardTitle>
+        <CardDescription>
+          {step === 1 ? 'Start by uploading a great photo of your product.' : 'Review and edit the AI-generated details.'}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         {step === 1 && (
           <div className="text-center">
-            <label htmlFor="image-upload" className="block text-lg font-medium text-gray-700 mb-4">
-              Start by uploading a great photo
-            </label>
-            <div className="w-full h-64 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-4">
+            <label
+              htmlFor="image-upload"
+              className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-magic-accent/50 rounded-lg cursor-pointer hover:bg-magic-accent/10 transition-colors mb-4"
+            >
               {imagePreview ? (
-                <img src={imagePreview} alt="Product preview" className="h-full w-full object-cover rounded-lg" />
+                <img src={imagePreview} alt="Product preview" className="h-full w-full object-contain rounded-lg" />
               ) : (
-                <span className="text-gray-500">Your image will appear here</span>
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <UploadCloud className="w-10 h-10 mb-3 text-muted-foreground" />
+                  <p className="mb-2 text-sm text-muted-foreground">
+                    <span className="font-semibold">Click to upload</span> or drag and drop
+                  </p>
+                  <p className="text-xs text-muted-foreground">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                </div>
               )}
-            </div>
-            <input id="image-upload" type="file" onChange={handleImageChange} className="hidden" accept="image/*" />
-            <label htmlFor="image-upload" className="cursor-pointer px-6 py-3 font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900">
-              Choose Image
             </label>
+            <input id="image-upload" type="file" onChange={handleImageChange} className="hidden" accept="image/*" />
             {image && (
-              <button
+              <Button
                 type="button"
                 onClick={handleGenerateListing}
                 disabled={isGenerating}
-                className="w-full mt-4 px-4 py-3 flex justify-center items-center font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900 disabled:bg-gray-400"
+                className="w-full"
               >
-                {isGenerating && <Spinner />}
+                {isGenerating ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Wand2 className="mr-2 h-4 w-4" />
+                )}
                 {isGenerating ? 'Generating...' : 'Generate Listing with AI'}
-              </button>
+              </Button>
             )}
           </div>
         )}
 
-        {/* Step 2: Edit and Save */}
         {step === 2 && (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-              <input type="text" id="title" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 block w-full" required />
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-1">
+              {imagePreview && (
+                <div>
+                  <Label>Product Preview</Label>
+                  <img src={imagePreview} alt="Product preview" className="mt-2 w-full object-contain rounded-lg border-2 border-dashed border-magic-accent/50 p-2" />
+                </div>
+              )}
             </div>
-            <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-              <textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} className="mt-1 block w-full" required></textarea>
+            <div className="md:col-span-2">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} rows={5} required />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="tags">Tags (comma-separated)</Label>
+                  <Input id="tags" value={tags} onChange={(e) => setTags(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="stock">Stock Count</Label>
+                    <Input id="stock" type="number" value={stock} onChange={(e) => setStock(parseInt(e.target.value, 10))} min="0" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="price">Price</Label>
+                    <Input id="price" type="number" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} min="0" step="0.01" required />
+                  </div>
+                </div>
+                {error && <p className="text-sm text-destructive">{error}</p>}
+                <Button type="submit" disabled={isSaving} className="w-full">
+                  {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {isSaving ? 'Saving...' : 'Save Product'}
+                </Button>
+              </form>
             </div>
-            <div>
-              <label htmlFor="tags" className="block text-sm font-medium text-gray-700">Tags (comma-separated)</label>
-              <input type="text" id="tags" value={tags} onChange={(e) => setTags(e.target.value)} className="mt-1 block w-full" />
-            </div>
-            <div>
-              <label htmlFor="stock" className="block text-sm font-medium text-gray-700">Stock Count</label>
-              <input type="number" id="stock" value={stock} onChange={(e) => setStock(parseInt(e.target.value, 10))} className="mt-1 block w-full" min="0" required />
-            </div>
-            <div>
-              <label htmlFor="price" className="block text-sm font-medium text-gray-700">Price</label>
-              <input type="number" id="price" value={price} onChange={(e) => setPrice(parseFloat(e.target.value))} className="mt-1 block w-full" min="0" step="0.01" required />
-            </div>
-            {error && <p className="text-sm text-red-600">{error}</p>}
-            <button
-              type="submit"
-              disabled={isSaving}
-              className="w-full px-4 py-3 flex justify-center items-center font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900 disabled:bg-gray-400"
-            >
-              {isSaving && <Spinner />}
-              {isSaving ? 'Saving...' : 'Save Product'}
-            </button>
-          </form>
+          </div>
         )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -1,54 +1,114 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { createClient } from "@/utils/supabase/client";
+import { Sparkles, Store, Users } from "lucide-react";
 
 export default function LoginPage() {
   const handleGoogleLogin = async () => {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider: "google",
       options: {
         redirectTo: `${location.origin}/api/auth/callback`,
         queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
+          access_type: "offline",
+          prompt: "consent",
         },
       },
     });
     if (error) {
-      console.error('Error logging in:', error.message);
+      console.error("Error logging in:", error.message);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="w-full max-w-sm p-8 space-y-8 bg-white rounded-xl shadow-lg text-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome to StoreGenie
+    <div className="min-h-screen bg-gradient-to-br from-background via-magic-accent/20 to-magic-secondary/30 flex items-center justify-center p-6">
+      <div className="w-full max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="mb-6 animate-magic-float">
+            <div className="inline-block p-4 rounded-full bg-gradient-to-br from-magic-primary to-magic-secondary shadow-lg">
+              <Sparkles className="h-12 w-12 text-white" />
+            </div>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+            Welcome to{" "}
+            <span className="bg-gradient-to-r from-magic-primary to-magic-secondary bg-clip-text text-transparent">
+              StoreGenie
+            </span>
           </h1>
-          <p className="mt-2 text-gray-600">
-            Sign in to create and manage your store.
+          <p className="text-xl text-muted-foreground">
+            Choose how you&amp;apos;d like to get started
           </p>
         </div>
-        <button
-          onClick={handleGoogleLogin}
-          className="w-full inline-flex justify-center items-center gap-3 py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-md font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all"
-        >
-          <svg
-            className="w-6 h-6"
-            aria-hidden="true"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" />
-            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-            <path d="M1 1h22v22H1z" fill="none" />
-          </svg>
-          Sign in with Google
-        </button>
+
+        {/* Login Options */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+          {/* Seller Login */}
+          <Card className="bg-card/80 backdrop-blur-sm border-magic-accent hover:shadow-lg transition-all duration-300 hover:scale-105">
+            <CardHeader className="text-center pb-4">
+              <div className="mb-4 p-3 rounded-full bg-magic-accent/50 w-fit mx-auto">
+                <Store className="h-8 w-8 text-magic-primary" />
+              </div>
+              <CardTitle className="text-2xl text-foreground">
+                I&apos;m a Seller
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Create and manage your magical storefront
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ul className="text-sm text-muted-foreground space-y-2">
+                <li>• Upload and showcase your products</li>
+                <li>• Get AI-generated descriptions</li>
+                <li>• Manage inventory and orders</li>
+                <li>• Connect with customers</li>
+              </ul>
+              <Button
+                onClick={handleGoogleLogin}
+                className="w-full bg-gradient-to-r from-magic-primary to-magic-secondary hover:from-magic-primary/90 hover:to-magic-secondary/90 text-white"
+                size="lg"
+              >
+                <Store className="mr-2 h-4 w-4" />
+                Sign in as Seller
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Buyer Login */}
+          <Card className="bg-card/80 backdrop-blur-sm border-magic-accent hover:shadow-lg transition-all duration-300 hover:scale-105">
+            <CardHeader className="text-center pb-4">
+              <div className="mb-4 p-3 rounded-full bg-magic-accent/50 w-fit mx-auto">
+                <Users className="h-8 w-8 text-magic-primary" />
+              </div>
+              <CardTitle className="text-2xl text-foreground">
+                I&apos;m a Buyer
+              </CardTitle>
+              <CardDescription className="text-muted-foreground">
+                Discover and shop unique handmade items
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ul className="text-sm text-muted-foreground space-y-2">
+                <li>• Browse beautiful storefronts</li>
+                <li>• Reserve unique products</li>
+                <li>• Request custom creations</li>
+                <li>• Connect with artists</li>
+              </ul>
+              <p className="text-xs text-muted-foreground text-center pt-8">
+                Or browse stores without signing in
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

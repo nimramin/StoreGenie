@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import { useCart } from '@/hooks/useCart';
+import { useState } from "react";
+import { useCart } from "@/hooks/useCart";
 
 type Product = {
   id: string;
@@ -21,23 +21,23 @@ export default function ProductDetails({ product }: { product: Product }) {
   const addToCart = async () => {
     setIsAdding(true);
     try {
-      const response = await fetch('/api/cart', {
-        method: 'POST',
+      const response = await fetch("/api/cart", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ product_id: product.id, quantity }),
       });
 
       if (response.ok) {
         refetch();
-        alert('Added to cart!');
+        alert("Added to cart!");
       } else {
-        alert('Error adding to cart');
+        alert("Error adding to cart");
       }
     } catch (error) {
-      console.error('Error adding to cart:', error);
-      alert('Error adding to cart');
+      console.error("Error adding to cart:", error);
+      alert("Error adding to cart");
     } finally {
       setIsAdding(false);
     }
@@ -64,16 +64,23 @@ export default function ProductDetails({ product }: { product: Product }) {
 
           {/* Product info */}
           <div className="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">{product.title}</h1>
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+              {product.title}
+            </h1>
 
             <div className="mt-3">
               <h2 className="sr-only">Product information</h2>
-              <p className="text-3xl tracking-tight text-gray-900">${product.price.toFixed(2)}</p>
+              <p className="text-3xl tracking-tight text-gray-900">
+                ${product.price.toFixed(2)}
+              </p>
             </div>
 
             <div className="mt-6">
               <h3 className="sr-only">Description</h3>
-              <div className="space-y-6 text-base text-gray-700" dangerouslySetInnerHTML={{ __html: product.description || '' }} />
+              <div
+                className="space-y-6 text-base text-gray-700"
+                dangerouslySetInnerHTML={{ __html: product.description || "" }}
+              />
             </div>
 
             <div className="mt-10">
@@ -83,12 +90,14 @@ export default function ProductDetails({ product }: { product: Product }) {
                 disabled={isAdding}
                 className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
               >
-                {isAdding ? 'Adding...' : 'Add to bag'}
+                {isAdding ? "Adding..." : "Add to bag"}
               </button>
             </div>
 
             <div className="mt-4 text-center">
-              <p className="text-sm text-gray-500">Sold by: {product.storeName}</p>
+              <p className="text-sm text-gray-500">
+                Sold by: {product.storeName}
+              </p>
             </div>
           </div>
         </div>

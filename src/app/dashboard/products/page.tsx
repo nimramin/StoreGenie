@@ -1,55 +1,66 @@
-import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
-import ProductActions from '@/components/ProductActions';
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PlusCircle, Package } from "lucide-react";
+import ProductActions from "@/components/ProductActions";
 
 export default async function ProductsPage() {
   const supabase = await createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
-    redirect('/login');
+    redirect("/login");
   }
 
   const { data: products, error } = await supabase
-    .from('products')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
+    .from("products")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
 
   if (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     // Handle error appropriately
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-50 p-4">
-      <div className="w-full max-w-4xl p-8 bg-white rounded-xl shadow-lg">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Manage Your Products
-          </h1>
-          <Link
-            href="/dashboard/products/new"
-            className="px-4 py-2 text-sm font-medium text-white bg-gray-800 rounded-lg hover:bg-gray-900"
-          >
-            + Add New Product
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold text-foreground">Products</h1>
+        <Button asChild>
+          <Link href="/dashboard/products/new">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add New Product
           </Link>
-        </div>
+        </Button>
+      </div>
 
-        <div className="flow-root">
+      <Card className="bg-card/80 backdrop-blur-sm border-magic-accent">
+        <CardHeader>
+          <CardTitle>Your Product Listings</CardTitle>
+        </CardHeader>
+        <CardContent>
           {products && products.length > 0 ? (
-            <ul className="-my-5 divide-y divide-gray-200">
+            <ul className="divide-y divide-magic-accent/20">
               {products.map((product) => (
-                <li key={product.id} className="py-5 flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <img className="h-16 w-16 rounded-lg object-cover" src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product_images/${product.image}`} alt={product.title} />
-                  </div>
+                <li
+                  key={product.id}
+                  className="py-4 flex items-center space-x-4"
+                >
+                  <img
+                    className="h-20 w-20 rounded-lg object-cover border-2 border-magic-accent/30"
+                    src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/product_images/${product.image}`}
+                    alt={product.title}
+                  />
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-gray-800 truncate">
+                    <h3 className="text-lg font-semibold text-foreground truncate">
                       {product.title}
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       Stock: {product.stock} | Price: ${product.price}
                     </p>
                   </div>
@@ -58,13 +69,18 @@ export default async function ProductsPage() {
               ))}
             </ul>
           ) : (
-            <div className="text-center py-12">
-              <h2 className="text-xl font-semibold text-gray-700">No products yet!</h2>
-              <p className="mt-2 text-gray-500">Click &quot;Add New Product&quot; to get started.</p>
+            <div className="text-center py-16">
+              <Package className="mx-auto h-12 w-12 text-muted-foreground/50" />
+              <h2 className="mt-4 text-xl font-semibold text-foreground">
+                No products yet!
+              </h2>
+              <p className="mt-2 text-muted-foreground">
+                Click & Add New Product & to get started.
+              </p>
             </div>
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
