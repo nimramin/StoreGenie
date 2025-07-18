@@ -1,3 +1,8 @@
+Something i spinned-up over the weekend, click on the image below to watch a quick walkthrough... 
+
+[![Watch the demo](Landing%20Page.png)]([https://www.loom.com/share/your-video-id](https://www.loom.com/share/51fd640b8aae4a2fa2a4c01a40174a2a?sid=da1fa74a-8dc9-4181-98a3-532ed36e6e51))
+
+
 # StoreGenie AI
 
 StoreGenie AI is a modern, AI-powered e-commerce platform that allows creators to set up their own online stores and sell products with ease. This project is built with Next.js and Supabase, and it leverages the power of Google's Gemini AI to assist with product creation.
