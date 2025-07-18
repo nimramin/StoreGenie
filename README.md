@@ -1,6 +1,9 @@
-Something Simple i spinned-up over the weekend, click on the image below to watch a quick walkthrough... 
+Something Simple i spinned-up over the weekend... 
 
-[![Watch the demo](Landing%20Page.png)]([https://www.loom.com/share/your-video-id](https://www.loom.com/share/51fd640b8aae4a2fa2a4c01a40174a2a?sid=da1fa74a-8dc9-4181-98a3-532ed36e6e51))
+[![Watch Walkthrough](https://img.shields.io/badge/Watch%20Demo%20on-Loom-fb5c39?logo=loom&logoColor=white)](https://www.loom.com/share/51fd640b8aae4a2fa2a4c01a40174a2a?sid=da1fa74a-8dc9-4181-98a3-532ed36e6e51)
+
+
+![DEMO SS](Landing%20Page.png)
 
 
 # StoreGenie AI
